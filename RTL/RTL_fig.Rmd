@@ -1,0 +1,458 @@
+---
+title: "RTL"
+author: "ZS"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+#### cont MCAR read data
+```{r}
+
+complete99<-data.frame(read.csv("../Result/result_cont_MCAR_complete99.csv"))
+
+ones99<-data.frame(read.csv("../Result/result_cont_MCAR_ones99.csv"))
+
+impute99<-data.frame(read.csv("../Result/result_cont_MCAR_complete99.csv"))
+
+complete=data.frame(rbind(complete99))
+impute=data.frame(rbind(impute99))
+ones=data.frame(rbind(ones99))
+```
+
+####cont MCAR line plot 0.1
+```{r}
+library(reshape2)
+library(dplyr)
+library(ggplot2)
+colnames(complete)
+box=complete[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+box_wide$method=as.factor(box_wide$method)
+box_wide_mean = box_wide %>%
+  group_by(method)%>%
+  summarise_all(mean)
+dim(box_wide_mean)#5,26
+box_long_mean=melt(box_wide_mean,id.vars=colnames(box_wide_mean)[1:16],variable.name = "below_qua")
+dim(box_long_mean)#50,18
+colnames(box_long_mean)
+box_long_mean$below_qua=as.numeric(substr(box_long_mean$below_qua,13,99))/10
+
+box_long_mean$weights="(b)-tl"
+
+tb_complete=box_long_mean
+
+
+box=ones[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+box_wide$method=as.factor(box_wide$method)
+box_wide_mean = box_wide %>%
+  group_by(method)%>%
+  summarise_all(mean)
+dim(box_wide_mean)#5,26
+box_long_mean=melt(box_wide_mean,id.vars=colnames(box_wide_mean)[1:16],variable.name = "below_qua")
+dim(box_long_mean)#50,18
+colnames(box_long_mean)
+box_long_mean$below_qua=as.numeric(substr(box_long_mean$below_qua,13,99))/10
+box_long_mean$weights="(a)uniform"
+
+tb_ones=box_long_mean
+
+tb_3=data.frame(rbind(tb_complete,tb_ones))
+tb3_0=tb_3
+```
+
+#### cont MCAR 40 read data
+```{r}
+complete99<-data.frame(read.csv("../Result/result_cont_MCAR_40_complete99.csv"))
+
+ones99<-data.frame(read.csv("../Result/result_cont_MCAR_40_ones99.csv"))
+
+impute99<-data.frame(read.csv("../Result/result_cont_MCAR_40_impute99.csv"))
+
+
+complete=data.frame(rbind(complete99))
+impute=data.frame(rbind(impute99))
+ones=data.frame(rbind(ones99))
+
+```
+
+####cont MCAR line plot combined
+####read 0.1; then run line plot 0.1; then read 0.4; then run this combined section
+```{r}
+tb_3_0.1=tb_3
+tb_3_0.1$method=as.character(tb_3_0.1$method)
+tb_3_0.1[which(tb_3_0.1$method=="3-robust"),]$method="3-robust-0.1"
+library(reshape2)
+library(dplyr)
+library(ggplot2)
+colnames(complete)
+box=complete[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+box_wide$method=as.factor(box_wide$method)
+box_wide_mean = box_wide %>%
+  group_by(method)%>%
+  summarise_all(mean)
+dim(box_wide_mean)
+box_long_mean=melt(box_wide_mean,id.vars=colnames(box_wide_mean)[1:16],variable.name = "below_qua")
+dim(box_long_mean)#50,18
+colnames(box_long_mean)
+box_long_mean$below_qua=as.numeric(substr(box_long_mean$below_qua,13,99))/10
+
+box_long_mean$weights="(b)-tl"
+
+tb_complete=box_long_mean
+
+
+box=ones[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+box_wide$method=as.factor(box_wide$method)
+box_wide_mean = box_wide %>%
+  group_by(method)%>%
+  summarise_all(mean)
+dim(box_wide_mean)#5,26
+box_long_mean=melt(box_wide_mean,id.vars=colnames(box_wide_mean)[1:16],variable.name = "below_qua")
+dim(box_long_mean)#50,18
+colnames(box_long_mean)
+box_long_mean$below_qua=as.numeric(substr(box_long_mean$below_qua,13,99))/10
+box_long_mean$weights="(a)uniform"
+
+tb_ones=box_long_mean
+
+
+tb_3=data.frame(rbind(tb_complete,tb_ones))
+tb3_0=tb_3
+
+tb_3_0.4=tb_3[which(tb_3$method=="3-robust"),]
+tb_3_0.4$method=as.character(tb_3_0.4$method)
+tb_3_0.4$method="3-robust-0.4"
+
+tb_3=data.frame(rbind(tb_3_0.1,tb_3_0.4))
+
+tb_3=tb_3[which(tb_3$method!="1-naive"),]
+tb_3$method=as.character(tb_3$method)
+tb_3$method[which(tb_3$method=="2-mean")]="1-mean"
+tb_3$method[which(tb_3$method=="3-robust-0.1")]="2-robust-0.1"
+tb_3$method[which(tb_3$method=="3-robust-0.4")]="2-robust-0.4"
+tb_3$method[which(tb_3$method=="4-full")]="3-full"
+tb_3$method[which(tb_3$method=="5-trueOptimal")]="4-trueOptimal "
+
+tb_3$method=as.factor(tb_3$method)
+
+
+levels(tb_3$method)=c("mean,mean-tl",paste0("robust,RTL ","(","\u03C4","=0.1)"),
+                      paste0("robust,RTL ","(","\u03C4","=0.4)"),
+                      "full,full-tl","trueOptimal" )
+levels(tb_3$method)=c("mean",paste0("robust ","(","\u03C4","=0.1)"),
+                      paste0("robust ","(","\u03C4","=0.4)"),
+                      "full","trueOptimal" )
+tb_3$weights=as.factor(tb_3$weights)
+
+levels(tb_3$weights)=c("(a) Unweighted","(b) Using transfer weight (-tl)")
+levels(tb_3$weights)=c("(a) Unweighted","(b) Parametric weight")
+
+names(tb_3)[which(names(tb_3)=="method")]="Method"
+names(tb_3)[which(names(tb_3)=="weights")]="Weight type"
+ggplot(
+tb_3, aes(x = below_qua, y =value, group=Method)) + 
+  geom_line(aes(color=Method,linetype=`Weight type`)) +
+  geom_point(aes(color=Method,shape=`Weight type`)) +
+  facet_grid(. ~ `Weight type`) +
+  xlim(0,1)+
+  xlab("Population Quantile Assessed (PQA)")+
+  ylab("Value")+
+  scale_linetype_manual(values = c("dashed","solid")) + 
+  theme(axis.text=element_text(size=12),axis.title=element_text(size=16),legend.text = element_text(size = 14),legend.title = element_text(size = 14),strip.text =element_text(size=16))+
+  guides(color = guide_legend(override.aes = list(size=0.7,shape=NA)))
+```
+
+#### cont MAR read data
+```{r}
+
+complete99<-data.frame(read.csv("../Result/result_cont_MAR_complete99.csv"))
+ones99<-data.frame(read.csv("../Result/result_cont_MAR_ones99.csv"))
+impute99<-data.frame(read.csv("../Result/result_cont_MAR_impute99.csv"))
+
+
+complete=data.frame(rbind(complete99))
+impute=data.frame(rbind(impute99))
+ones=data.frame(rbind(ones99))
+
+```
+
+#### cont MNAR read data 
+```{r}
+
+complete99<-data.frame(read.csv("../Result/result_cont_MNAR_complete99.csv"))
+ones99<-data.frame(read.csv("../Result/result_cont_MNAR_ones99.csv"))
+impute99<-data.frame(read.csv("../Result/result_cont_MNAR_impute99.csv"))
+
+complete=data.frame(rbind(complete99))
+impute=data.frame(rbind(impute99))
+ones=data.frame(rbind(ones99))
+
+```
+
+####cont MAR MNAR box plot
+```{r}
+library(reshape2)
+
+box=complete[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+
+box_wide$weights="(b) complete"
+tb_complete=box_wide
+
+box=ones[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+
+box_wide$weights="(a) unweighted"
+tb_ones=box_wide
+
+box=impute[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+
+box_wide$weights="(c) complete+impute"
+tb_impute=box_wide
+
+
+tb_3=data.frame(rbind(tb_complete,tb_impute,tb_ones))
+tb3_0=tb_3
+tb_3=tb_3[which(tb_3$method!="5-trueOptimal"),]
+tb_3=tb_3[which(tb_3$method!="1-naive"),]
+tb_3$method=as.character(tb_3$method)
+tb_3$method[which(tb_3$method=="2-mean")]="1-mean"
+tb_3$method[which(tb_3$method=="3-robust")]="2-robust"
+tb_3$method[which(tb_3$method=="4-full")]="3-full"
+tb_3$method=as.factor(tb_3$method)
+
+
+
+
+levels(tb_3$method)=c("mean,mean-tl",paste0("robust,RTL ","(","\u03C4","=0.1)"),
+                      "full,full-tl","5-trueOptimal" )
+
+
+levels(tb_3$method)=c("mean",paste0("robust ","(","\u03C4","=0.1)"),
+                      "full","5-trueOptimal" )
+
+levels(tb_3$weights)=c("(a) unweighted","(b) complete" ,"(c) complete+impute")
+
+names(tb_3)[which(names(tb_3)=="method")]="Method"
+names(tb_3)[which(names(tb_3)=="weights")]="Weight type"
+library(ggplot2)
+
+ggplot(
+tb_3, aes(x = `Weight type`, y =value_all, fill=Method, linetype=`Weight type`)) + 
+geom_boxplot() +
+   scale_linetype_manual(values = c("solid", "dashed", "dotted")) +
+  ylim(10,20.5)+
+  ylab("Value over all samples")+
+  xlab("Weight type")+
+    ggtitle("MAR")+
+  geom_hline(yintercept=mean(tb3_0[which(tb3_0$method=="5-trueOptimal"),]$value_all), linetype="dashed", color = "black")+
+  theme(axis.text=element_text(size=12),axis.title=element_text(size=16),legend.text = element_text(size = 16),legend.title = element_text(size = 16),plot.title = element_text(size = 16),
+  panel.grid.major = element_blank(), 
+  panel.grid.minor = element_blank()
+  )
+
+
+
+ggplot(
+tb_3, aes(x = `Weight type`, y =value_minor, fill=Method, linetype=`Weight type`)) + 
+geom_boxplot() +
+  scale_linetype_manual(values = c("solid", "dashed", "dotted")) +  # Adjust patterns as needed
+  ylim(0,20.5)+
+  ylab("Value over the vulnerable group")+
+  xlab("Weight type")+
+    ggtitle("MAR")+
+  geom_hline(yintercept=mean(tb3_0[which(tb3_0$method=="5-trueOptimal"),]$value_minor), linetype="dashed", color = "black")+
+  theme(axis.text=element_text(size=12),axis.title=element_text(size=16),legend.text = element_text(size = 16),legend.title = element_text(size = 16),plot.title = element_text(size = 16),
+  panel.grid.major = element_blank(), 
+  panel.grid.minor = element_blank()
+  )
+
+```
+
+#### cont NP read data
+```{r}
+
+complete99<-data.frame(read.csv("../Result/np_result_cont_MCAR_complete99.csv"))
+
+ones99<-data.frame(read.csv("../Result/np_result_cont_MCAR_ones99.csv"))
+
+impute99<-data.frame(read.csv("../Result/np_result_cont_MCAR_np99.csv"))
+
+
+complete=data.frame(rbind(complete99))
+impute=data.frame(rbind(impute99))
+ones=data.frame(rbind(ones99))
+
+```
+
+#### cont NP linear read data
+```{r}
+
+complete99<-data.frame(read.csv("../Result/np_linear_result_cont_MCAR_complete99.csv"))
+
+ones99<-data.frame(read.csv("../Result/np_linear_result_cont_MCAR_ones99.csv"))
+
+impute99<-data.frame(read.csv("../Result/np_linear_result_cont_MCAR_np99.csv"))
+
+
+complete=data.frame(rbind(complete99))
+impute=data.frame(rbind(impute99))
+ones=data.frame(rbind(ones99)) 
+
+```
+
+####cont NP box plot
+```{r}
+library(reshape2)
+
+box=complete[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+
+box_wide$weights="(b) parametric"
+tb_complete=box_wide
+
+box=ones[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+
+box_wide$weights="(a) unweighted"
+tb_ones=box_wide
+
+box=impute[,c(3:4,6,5,7:9)]
+colnames(box)[1:5]=c("1-naive","2-mean","3-robust","4-full","5-trueOptimal")
+box_long=melt(box,id.vars=c("metrics","loop"),variable.name = "method")
+
+box_wide=reshape(data = box_long,
+                    idvar= c("loop","method"),
+                    timevar= "metrics",
+                    direction = "wide")
+
+colnames(box_wide)[3:ncol(box_wide)]=substr(colnames(box_wide)[3:ncol(box_wide)],7,99)
+
+box_wide$weights="(c) NP"
+tb_impute=box_wide
+
+
+tb_3=data.frame(rbind(tb_complete,tb_impute,tb_ones))
+tb3_0=tb_3
+tb_3=tb_3[which(tb_3$method!="5-trueOptimal"),]
+tb_3=tb_3[which(tb_3$method!="1-naive"),]
+tb_3$method=as.character(tb_3$method)
+tb_3$method[which(tb_3$method=="2-mean")]="1-mean"
+tb_3$method[which(tb_3$method=="3-robust")]="2-robust"
+tb_3$method[which(tb_3$method=="4-full")]="3-full"
+tb_3$method=as.factor(tb_3$method)
+
+
+levels(tb_3$method)=c("mean",paste0("robust ","(","\u03C4","=0.1)"),
+                      "full","5-trueOptimal" )
+levels(tb_3$weights)=c("(a) unweighted","(b) parametric" ,"(c) NP")
+names(tb_3)[which(names(tb_3)=="method")]="Method"
+names(tb_3)[which(names(tb_3)=="weights")]="Weight type"
+
+library(ggplot2)
+
+ggplot(
+tb_3, aes(x = `Weight type`, y =value_all, fill=Method, linetype=`Weight type`)) + 
+geom_boxplot() +
+    scale_linetype_manual(values = c("solid", "dashed", "dotted")) + 
+  ylim(10,20.5)+
+    ylab("Value over all samples")+
+  xlab("Weight type")+
+    ggtitle("Model slightly misspecified")+
+  geom_hline(yintercept=mean(tb3_0[which(tb3_0$method=="5-trueOptimal"),]$value_all), linetype="dashed", color = "black")+
+    theme(axis.text=element_text(size=12),axis.title=element_text(size=16),legend.text = element_text(size = 16),legend.title = element_text(size = 16),plot.title = element_text(size = 16),
+  panel.grid.major = element_blank(), 
+  panel.grid.minor = element_blank()
+  )
+
+
+ggplot(
+tb_3, aes(x = `Weight type`, y =value_minor, fill=Method, linetype=`Weight type`)) + 
+geom_boxplot() +
+    scale_linetype_manual(values = c("solid", "dashed", "dotted")) + 
+  ylim(0,20.5)+
+    ylab("Value over the vulnerable group")+
+  xlab("Weight type")+
+    ggtitle("Model slightly misspecified")+
+  geom_hline(yintercept=mean(tb3_0[which(tb3_0$method=="5-trueOptimal"),]$value_minor), linetype="dashed", color = "black")+
+    theme(axis.text=element_text(size=12),axis.title=element_text(size=16),legend.text = element_text(size = 16),legend.title = element_text(size = 16),plot.title = element_text(size = 16),
+  panel.grid.major = element_blank(), 
+  panel.grid.minor = element_blank()
+  )
+
+```
+
